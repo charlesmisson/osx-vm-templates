@@ -14,7 +14,7 @@
       "parallels_tools_flavor": "mac",
       "type": "parallels-iso",
       "prlctl": [
-        ["set", "{{.Name}}", "--memsize", "2048"],
+        ["set", "{{.Name}}", "--memsize", "4096"],
         ["set", "{{.Name}}", "--memquota", "512:2048"],
         ["set", "{{.Name}}", "--cpus", "2"],
         ["set", "{{.Name}}", "--distribution", "macosx"],
@@ -42,7 +42,7 @@
       "type": "vmware-iso",
       "vmx_data": {
         "cpuid.coresPerSocket": "1",
-        "memsize": "2048",
+        "memsize": "4096",
         "numvcpus": "1",
         "firmware": "efi",
         "keyboardAndMouseProfile": "macProfile",
@@ -136,7 +136,8 @@
     "hiera_version": "none",
     "install_vagrant_keys": "true",
     "install_xcode_cli_tools": "true",
-    "iso_url": "OSX_InstallESD_10.11.1_15B42.dmg",
+    "iso_checksum": "8039bc7024e8f8e36d9341a7e9871da1",
+    "iso_url": "file:////Users/charles_misson/src/Others/osx-vm-templates/prepare_iso/out/OSX_InstallESD_10.12_16A319.dmg",
     "password": "vagrant",
     "provisioning_delay": "0",
     "puppet_version": "none",
