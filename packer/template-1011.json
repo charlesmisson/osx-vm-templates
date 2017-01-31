@@ -137,7 +137,7 @@
     "install_vagrant_keys": "true",
     "install_xcode_cli_tools": "true",
     "iso_checksum": "6640d1dc85b9c67f3ed33d498a375e96",
-    "iso_url": "file:////Users/charles/src/Others/osx-vm-templates/prepare_iso/out/OSX_InstallESD_10.11.6_15G31.dmg",
+    "iso_url": "file:////Users/charles/src/osx-vm-templates/prepare_iso/out/OSX_InstallESD_10.11.6_15G31.dmg",
     "password": "vagrant",
     "provisioning_delay": "0",
     "puppet_version": "none",
