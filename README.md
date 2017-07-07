@@ -8,8 +8,6 @@ The machine built by this Packer template defaults to being configured for use w
 - Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html)
 - [Parallels](https://github.com/Parallels/vagrant-parallels)
 
-*Note*: People have [reported issues](https://github.com/timsutton/osx-vm-templates/issues/72) using VirtualBox as of version 5.1.x. The 5.0.x releases seem to still work.
-
 It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems, e.g. continuous integration.
 
 Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox or Parallels support.
@@ -27,6 +25,16 @@ Provisioning steps that are defined in the template via items in the [scripts](h
 Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through El Capitan (10.11), and macOS Sierra (10.12).
 
 This project currently only supplies a single Packer template (`template.json`), so the hypervisor's configured guest OS version (i.e. `darwin12-64`) does not accurately reflect the actual installed OS. I haven't found there to be any functional differences depending on these configured guest versions.
+
+To build a VMware box of an OS version less than El Capitan (10.11), note that as of VMare Fusion 8.5.4, you will need to change the `tools_upload_flavor` from `darwin` to `darwinPre15`.
+
+## Issue with 10.12.4
+
+**Important note:** The Sierra 10.12.4 installer seems to no longer support including custom packages as part of the installer, unless they are signed by Apple. This produces an error with the text, "macOS could not be installed on your computer.. The package veewee-config.pkg is not signed."
+
+The `prepare_iso.sh` script in this repo makes use of functionality Apple supports as part of a [NetInstall workflow](https://help.apple.com/systemimageutility/mac/10.12/#/sysmb1457f0b), but because of this (undocumented) additional requirement of additional packages needing to be signed by Apple as of 10.12.4, these tools can't currently install the necessary configuration for Packer to log in to perform additional configuration, installing guest tools, etc. The rest of the OS install still completes successfully.
+
+It may be possible to work around this by modifying the rc script directly with the contents of our postinstall script.
 
 ## Preparing the ISO
 
@@ -94,6 +102,15 @@ packer build \
   template.json
 ```
 
+### Building to a device with more space
+
+Local VM builds take up a lot of space. It's possible to make packer work in different directories.
+
+* [`PACKER_CACHE_DIR`](https://www.packer.io/docs/other/environment-variables.html#packer_cache_dir) is an out-of-the-box environment variable that configures where it will cache ISOs etc.
+* `PACKER_OUTPUT_DIR`: configure where packer will build artifacts (like OVF files) to
+* `PACKER_VAGRANT_BOX_DIR`: configure where packer will build vagrant boxes via the post-processor to.
+
+**Note:** don't make `PACKER_OUTPUT_DIR` and `PACKER_VAGRANT_BOX_DIR` the same place. `keep_input_artifacts` in the post-processor defaults to `false`, and it removes them by removing the directory, not the individual files. So if you use the same place, you'll end up with no output at all (packer `v1.0.0`).
 
 ## Automated installs on OS X
 
@@ -172,15 +189,6 @@ The default `prepare_iso.sh` configuration enables Remote Management during inst
 sudo ./prepare_iso/prepare_iso.sh -D DISABLE_REMOTE_MANAGEMENT "/Applications/Install OS X El Capitan.app" out
 ```
 
-#### Extension Pack
-
-The VirtualBox Extension Pack, available from the [Download VirtualBox](https://www.virtualbox.org/wiki/Downloads) page or as the [Homebrew cask](http://caskroom.io/) [virtualbox-extension-pack](https://github.com/caskroom/homebrew-cask/blob/master/Casks/virtualbox-extension-pack.rb), is now required by default because we enable EHCI (USB 2.0) support like the default VirtualBox OS X template does.
-
-If you cannot use the Extension Pack, you can remove the line that enables EHCI support from [`packer/template.json`](https://github.com/timsutton/osx-vm-templates/blob/master/packer/template.json):
-
-```
-        ["modifyvm", "{{.Name}}", "--usbehci", "on"],
-```
 
 #### Shared folders
 
